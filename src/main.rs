@@ -1,3 +1,5 @@
+#![feature(result_option_inspect)]
+
 mod block;
 mod blockchain;
 mod power;
@@ -9,7 +11,7 @@ use tracing_subscriber::FmtSubscriber;
 
 use blockchain::BlockChain;
 
-#[tokio::main]
+#[tokio::main(flavor = "multi_thread")]
 async fn main() -> Result<()> {
     let subscriber = FmtSubscriber::builder().finish();
     tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
