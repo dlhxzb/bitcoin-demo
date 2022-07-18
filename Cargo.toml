@@ -13,3 +13,5 @@ serde = { version = "1.0", features = ["derive"] }
 tokio = { version = "1", features = ["full"] }
 tracing = "0.1"
 tracing-subscriber = "0.3"
+leveldb-orm = { version ="0.1", path = "../leveldb-orm/leveldb-orm", features = ["macros"] }
+leveldb = "0.8"
