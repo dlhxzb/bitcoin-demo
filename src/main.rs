@@ -4,6 +4,7 @@
 mod block;
 mod blockchain;
 mod pow;
+mod transaction;
 mod util;
 
 use anyhow::Result;
@@ -11,6 +12,7 @@ use tracing::*;
 use tracing_subscriber::FmtSubscriber;
 
 use blockchain::BlockChain;
+use transaction::Transaction;
 
 #[tokio::main(flavor = "multi_thread")]
 async fn main() -> Result<()> {
@@ -25,10 +27,17 @@ async fn main() -> Result<()> {
             BlockChain::new()?
         }
     };
-    let tranxs = "0xabcd -> 0xabce: 5 btc".to_string();
-    bc.add_block(String::from(tranxs))?;
-    let tranxs = "0xabcd -> 0xabcf: 2.5 btc".to_string();
-    bc.add_block(String::from(tranxs))?;
+    let from = "0xabcd".to_string();
+    let to = "0xabce".to_string();
+    let sign = format!("{from} -> {to}: 9 btc");
+    let tx = Transaction::new(from, to, 9, 1, 0, sign)?;
+    bc.add_block(vec![tx])?;
+
+    let from = "0xabce".to_string();
+    let to = "0xabcf".to_string();
+    let sign = format!("{from} -> {to}: 6 btc");
+    let tx = Transaction::new(from, to, 6, 1, 0, sign)?;
+    bc.add_block(vec![tx])?;
 
     info!(?bc.blocks);
     info!("End");

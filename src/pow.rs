@@ -35,14 +35,14 @@ pub fn mining(block: &Block, difficuty: u32) -> Option<Block> {
             let end = MAX_NONCE / thread_count * i;
             s.spawn(move || {
                 {
-                    for noice in start..end {
-                        if noice % 10000 == 0 {
-                            debug!(?i, ?noice);
+                    for nonce in start..end {
+                        if nonce % 10000 == 0 {
+                            debug!(?i, ?nonce);
                         }
                         if b_found.load(Ordering::Relaxed) {
                             break;
                         }
-                        block.header.noice = noice;
+                        block.header.nonce = nonce;
                         let hash = U256::from(hash_u8(&block.header)?);
                         if hash <= target {
                             if b_found
@@ -50,8 +50,8 @@ pub fn mining(block: &Block, difficuty: u32) -> Option<Block> {
                                 .is_ok()
                             {
                                 info!(
-                                    "noice = {}, hash = 0x{:0>64}",
-                                    noice,
+                                    "nonce = {}, hash = 0x{:0>64}",
+                                    nonce,
                                     format!("{:#x}", hash).split('x').last().unwrap()
                                 );
                             }

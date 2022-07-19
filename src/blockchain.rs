@@ -1,4 +1,5 @@
 use crate::block::{Block, TailHash};
+use crate::transaction::Transaction;
 use anyhow::{Context, Result};
 use leveldb::database::Database;
 use leveldb_orm::EncodedKey;
@@ -28,12 +29,16 @@ impl BlockChain {
         options.create_if_missing = true;
         let tail_db = Database::open(std::path::Path::new(TAIL_DB_DIR), options)?;
 
-        let first_block = Block::new(
-            "First block".to_string(),
-            FIRST_HASH.to_string(),
-            INIT_DIFFICUTY,
-        )?
-        .expect("Create first block failed");
+        let first_trans = Transaction::new(
+            "0x0000".to_owned(),
+            "0x0000".to_owned(),
+            0,
+            0,
+            0,
+            "创世区块".to_owned(),
+        )?;
+        let first_block = Block::new(vec![first_trans], FIRST_HASH.to_string(), INIT_DIFFICUTY)?
+            .expect("Create first block failed");
 
         let tail = TailHash {
             tail_tag: TAIL_TAG.to_owned(),
@@ -79,7 +84,7 @@ impl BlockChain {
         })
     }
 
-    pub fn add_block(&mut self, data: String) -> Result<()> {
+    pub fn add_block(&mut self, trans: Vec<Transaction>) -> Result<()> {
         let pre_hash = self
             .blocks
             .last()
@@ -89,7 +94,7 @@ impl BlockChain {
 
         let difficuty = 0; // TODO: calc difficuty
 
-        if let Some(block) = Block::new(data, pre_hash, difficuty)? {
+        if let Some(block) = Block::new(trans, pre_hash, difficuty)? {
             let tail = TailHash {
                 tail_tag: TAIL_TAG.to_owned(),
                 header_hash: block.header_hash.clone(),

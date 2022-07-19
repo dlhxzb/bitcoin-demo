@@ -1,4 +1,5 @@
 use crate::pow::*;
+use crate::transaction::Transaction;
 use crate::util::*;
 use anyhow::Result;
 use chrono::{DateTime, Utc};
@@ -11,7 +12,7 @@ pub struct BlockHeader {
     pub pre_hash: String,
     pub tranxs_hash: String,
     pub time: DateTime<Utc>,
-    pub noice: u32,
+    pub nonce: u32,
     pub difficuty: u32,
 }
 
@@ -20,7 +21,7 @@ pub struct BlockHeader {
 pub struct Block {
     pub header: BlockHeader,
     pub header_hash: String,
-    pub tranxs: String,
+    pub tranxs: Vec<Transaction>,
 }
 
 #[derive(LeveldbOrm, Serialize, Deserialize, Clone, Debug)]
@@ -31,14 +32,14 @@ pub struct TailHash {
 }
 
 impl Block {
-    pub fn new(tranxs: String, pre_hash: String, difficuty: u32) -> Result<Option<Self>> {
+    pub fn new(tranxs: Vec<Transaction>, pre_hash: String, difficuty: u32) -> Result<Option<Self>> {
         info!("Creating block...");
         let tranxs_hash = hash_str(&tranxs)?;
         let header = BlockHeader {
             pre_hash,
             tranxs_hash,
             time: Utc::now(),
-            noice: 0,
+            nonce: 0,
             difficuty,
         };
         let block = Block {
